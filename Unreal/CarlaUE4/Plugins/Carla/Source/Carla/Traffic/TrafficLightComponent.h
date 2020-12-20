@@ -41,14 +41,8 @@ public:
   UFUNCTION(Category = "Traffic Light", BlueprintPure)
   ATrafficLightGroup* GetGroup();
 
-  const ATrafficLightGroup* GetGroup() const;
-
-  void SetController(UTrafficLightController* Controller);
-
   UFUNCTION(Category = "Traffic Light", BlueprintPure)
   UTrafficLightController* GetController();
-
-  const UTrafficLightController* GetController() const;
 
   virtual void InitializeSign(const carla::road::Map &Map) override;
 
@@ -76,10 +70,10 @@ private:
   UPROPERTY(Category = "Traffic Light", BlueprintAssignable)
   FLightChangeDispatcher LightChangeDispatcher;
 
-  // UPROPERTY(Category = "Traffic Light", VisibleAnywhere)
-  // ATrafficLightGroup *TrafficLightGroup = nullptr;
+  UPROPERTY()
+  ATrafficLightGroup *TrafficLightGroup = nullptr;
 
-  UPROPERTY(Category = "Traffic Light", VisibleAnywhere)
+  UPROPERTY()
   UTrafficLightController *TrafficLightController = nullptr;
 
   // Vehicles that have entered the trigger box of the traffic light

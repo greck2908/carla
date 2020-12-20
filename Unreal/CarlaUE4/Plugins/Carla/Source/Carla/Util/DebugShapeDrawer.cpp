@@ -21,12 +21,10 @@ struct FShapeVisitor
 
   FShapeVisitor(UWorld &InWorld, FColor InColor, float InLifeTime, bool bInPersistentLines)
     : World(&InWorld),
-      Color(InColor.ReinterpretAsLinear() * BrightMultiplier),
+      Color(InColor),
       LifeTime(InLifeTime),
       bPersistentLines(bInPersistentLines)
-  {
-    World->PersistentLineBatcher->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-  }
+  {}
 
   void operator()(const Shape::Point &Point) const
   {
@@ -167,31 +165,20 @@ struct FShapeVisitor
       return;
     }
     ACarlaHUD *Hud = Cast<ACarlaHUD>(PlayerController->GetHUD());
-    Hud->AddHUDString(carla::rpc::ToFString(Str.text), Str.location, Color.Quantize(), LifeTime);
+    Hud->AddHUDString(carla::rpc::ToFString(Str.text), Str.location, Color, LifeTime);
   }
 
 private:
 
   UWorld *World;
 
-  FLinearColor Color;
+  FColor Color;
 
   float LifeTime;
 
   bool bPersistentLines;
 
   uint8 DepthPriority = SDPG_World;
-
-  // Debug lines are way more dark in the package, that's why this
-  // multiplier is needed.
-#if UE_BUILD_SHIPPING
-  static constexpr double BrightMultiplier = 1000.0;
-#else
-  // @TODO: Use UKismetSystemLibrary::IsStandalone to support colors
-  // in Editor's standalone mode.
-  static constexpr double BrightMultiplier = 1.0;
-#endif
-
 };
 
 void FDebugShapeDrawer::Draw(const carla::rpc::DebugShape &Shape)

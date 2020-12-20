@@ -22,13 +22,7 @@ void UCarlaLightSubsystem::RegisterLight(UCarlaLight* CarlaLight)
 {
   if(CarlaLight)
   {
-    auto LightId = CarlaLight->GetId();
-    if (Lights.Contains(LightId))
-    {
-      UE_LOG(LogCarla, Warning, TEXT("Light Id overlapping"));
-      return;
-    }
-    Lights.Add(LightId, CarlaLight);
+    Lights.Add(CarlaLight->GetId(), CarlaLight);
   }
 }
 
@@ -89,15 +83,6 @@ void UCarlaLightSubsystem::SetLights(
     }
   }
 
-}
-
-UCarlaLight* UCarlaLightSubsystem::GetLight(int Id)
-{
-  if (Lights.Contains(Id))
-  {
-    return Lights[Id];
-  }
-  return nullptr;
 }
 
 void UCarlaLightSubsystem::SetClientStatesdirty(FString ClientThatUpdate)

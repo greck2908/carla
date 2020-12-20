@@ -48,8 +48,7 @@ foreach(target ${build_targets})
   target_include_directories(${target} SYSTEM PRIVATE
       "${BOOST_INCLUDE_PATH}"
       "${RPCLIB_INCLUDE_PATH}"
-      "${GTEST_INCLUDE_PATH}"
-      "${LIBPNG_INCLUDE_PATH}")
+      "${GTEST_INCLUDE_PATH}")
 
   target_include_directories(${target} PRIVATE
       "${libcarla_source_path}/test")

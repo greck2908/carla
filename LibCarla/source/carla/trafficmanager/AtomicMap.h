@@ -27,12 +27,7 @@ namespace traffic_manager {
     void AddEntry(const std::pair<Key, Value> &entry) {
 
       std::lock_guard<std::mutex> lock(map_mutex);
-      const Key& key = entry.first;
-      if (map.find(key) != map.end()) {
-        map.at(key) = entry.second;
-      } else {
-        map.insert(entry);
-      }
+      map.insert(entry);
     }
 
     bool Contains(const Key &key) const {

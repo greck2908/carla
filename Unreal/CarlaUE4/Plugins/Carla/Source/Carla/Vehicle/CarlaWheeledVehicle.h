@@ -13,7 +13,6 @@
 #include "Vehicle/VehicleLightState.h"
 #include "Vehicle/VehicleInputPriority.h"
 #include "Vehicle/VehiclePhysicsControl.h"
-#include "VehicleVelocityControl.h"
 #include "WheeledVehicleMovementComponent4W.h"
 
 #include "CoreMinimal.h"
@@ -111,10 +110,10 @@ public:
   }
 
   UFUNCTION(Category = "CARLA Wheeled Vehicle", BlueprintCallable)
-  FVehiclePhysicsControl GetVehiclePhysicsControl() const;
+  FVehiclePhysicsControl GetVehiclePhysicsControl();
 
   UFUNCTION(Category = "CARLA Wheeled Vehicle", BlueprintCallable)
-  FVehicleLightState GetVehicleLightState() const;
+  FVehicleLightState GetVehicleLightState();
 
   void ApplyVehiclePhysicsControl(const FVehiclePhysicsControl &PhysicsControl);
 
@@ -136,12 +135,6 @@ public:
       InputControl.Priority = Priority;
     }
   }
-
-  UFUNCTION(Category = "CARLA Wheeled Vehicle", BlueprintCallable)
-  void ActivateVelocityControl(const FVector &Velocity);
-
-  UFUNCTION(Category = "CARLA Wheeled Vehicle", BlueprintCallable)
-  void DeactivateVelocityControl();
 
   /// @todo This function should be private to AWheeledVehicleAIController.
   void FlushVehicleControl();
@@ -203,9 +196,6 @@ protected:
   UFUNCTION(BlueprintImplementableEvent)
   void RefreshLightState(const FVehicleLightState &VehicleLightState);
 
-  UFUNCTION(BlueprintCallable, CallInEditor)
-  void AdjustVehicleBounds();
-
 private:
 
   /// Current state of the vehicle controller (for debugging purposes).
@@ -214,9 +204,6 @@ private:
 
   UPROPERTY(Category = "CARLA Wheeled Vehicle", EditAnywhere)
   UBoxComponent *VehicleBounds;
-
-  UPROPERTY(Category = "CARLA Wheeled Vehicle", EditAnywhere)
-  UVehicleVelocityControl* VelocityControl;
 
   struct
   {

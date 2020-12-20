@@ -231,7 +231,7 @@ TEST(streaming, multi_stream) {
 
   Server srv(TESTING_PORT);
   srv.AsyncRun(number_of_clients);
-  auto stream = srv.MakeStream();
+  auto stream = srv.MakeMultiStream();
 
   for (auto i = 0u; i < iterations; ++i) {
     std::vector<std::pair<std::atomic_size_t, std::unique_ptr<Client>>> v(number_of_clients);

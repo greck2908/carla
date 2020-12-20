@@ -50,21 +50,15 @@ void AInertialMeasurementUnit::SetOwner(AActor *Owner)
   Super::SetOwner(Owner);
 }
 
-// Returns the angular velocity of Actor, expressed in the frame of Actor
+// Copy of FWorldObserver_GetAngularVelocity but using radiants
 static FVector FIMU_GetActorAngularVelocityInRadians(
     AActor &Actor)
 {
   const auto RootComponent = Cast<UPrimitiveComponent>(Actor.GetRootComponent());
-
-  FVector AngularVelocity;
-
-  if (RootComponent != nullptr) {
-      const FQuat ActorGlobalRotation = RootComponent->GetComponentTransform().GetRotation();
-      const FVector GlobalAngularVelocity = RootComponent->GetPhysicsAngularVelocityInRadians();
-      AngularVelocity = ActorGlobalRotation.UnrotateVector(GlobalAngularVelocity);
-  } else {
-      AngularVelocity = FVector::ZeroVector;
-  }
+  const FVector AngularVelocity =
+      RootComponent != nullptr ?
+          RootComponent->GetPhysicsAngularVelocityInRadians() :
+          FVector::ZeroVector;
 
   return AngularVelocity;
 }

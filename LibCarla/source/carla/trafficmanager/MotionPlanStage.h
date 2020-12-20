@@ -29,14 +29,12 @@ private:
   const LocalizationFrame &localization_frame;
   const CollisionFrame &collision_frame;
   const TLFrame &tl_frame;
-  const cc::World &world;
   // Structure holding the controller state for registered vehicles.
   std::unordered_map<ActorId, StateEntry> pid_state_map;
   // Structure to keep track of duration between teleportation
   // in hybrid physics mode.
-  std::unordered_map<ActorId, cc::Timestamp> teleportation_instance;
+  std::unordered_map<ActorId, TimeInstance> teleportation_instance;
   ControlFrame &output_array;
-  cc::Timestamp current_timestamp;
 
   std::pair<bool, float> CollisionHandling(const CollisionHazardData &collision_hazard,
                                            const bool tl_hazard,
@@ -61,7 +59,6 @@ public:
                   const LocalizationFrame &localization_frame,
                   const CollisionFrame &collision_frame,
                   const TLFrame &tl_frame,
-                  const cc::World &world,
                   ControlFrame &output_array);
 
   void Update(const unsigned long index);

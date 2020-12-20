@@ -11,10 +11,7 @@
 
 #include <compiler/disable-ue4-macros.h>
 #include <carla/rpc/Actor.h>
-#include <carla/rpc/ObjectLabel.h>
 #include <compiler/enable-ue4-macros.h>
-
-namespace crp = carla::rpc;
 
 /// A view over an actor and its properties.
 struct FActorInfo
@@ -23,11 +20,11 @@ public:
 
   FActorDescription Description;
 
-  TSet<crp::CityObjectLabel> SemanticTags;
+  TSet<ECityObjectLabel> SemanticTags;
 
   FBoundingBox BoundingBox;
 
-  crp::Actor SerializedData;
+  carla::rpc::Actor SerializedData;
 
   /// @todo To be used solely by the FWorldObserver.
   mutable FVector Velocity = {0.0f, 0.0f, 0.0f};

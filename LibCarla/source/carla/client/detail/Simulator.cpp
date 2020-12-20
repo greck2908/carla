@@ -90,7 +90,7 @@ namespace detail {
       using namespace std::literals::chrono_literals;
       _episode->WaitForState(10ms);
       auto episode = GetCurrentEpisode();
-      if (episode.GetId() != id) {
+      if (episode.GetId() != id && !_client.CheckIntermediateEpisode()) {
         return episode;
       }
     }
@@ -159,10 +159,6 @@ namespace detail {
   SharedPtr<BlueprintLibrary> Simulator::GetBlueprintLibrary() {
     auto defs = _client.GetActorDefinitions();
     return MakeShared<BlueprintLibrary>(std::move(defs));
-  }
-
-  rpc::VehicleLightStateList Simulator::GetVehiclesLightStates() {
-    return _client.GetVehiclesLightStates();
   }
 
   SharedPtr<Actor> Simulator::GetSpectator() {
@@ -289,10 +285,6 @@ namespace detail {
 
   void Simulator::UnSubscribeFromSensor(const Sensor &sensor) {
     _client.UnSubscribeFromStream(sensor.GetActorDescription().GetStreamToken());
-  }
-
-  void Simulator::FreezeAllTrafficLights(bool frozen) {
-    _client.FreezeAllTrafficLights(frozen);
   }
 
 } // namespace detail

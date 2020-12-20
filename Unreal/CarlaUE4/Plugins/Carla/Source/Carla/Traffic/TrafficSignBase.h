@@ -55,8 +55,6 @@ public:
   UFUNCTION(BlueprintImplementableEvent)
   UBoxComponent *GetTriggerVolume() const;
 
-  TArray<UBoxComponent*> GetTriggerVolumes() const;
-
 private:
 
   UPROPERTY(Category = "Traffic Sign", EditAnywhere)

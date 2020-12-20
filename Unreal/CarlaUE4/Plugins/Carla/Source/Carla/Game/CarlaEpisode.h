@@ -280,7 +280,7 @@ public:
     return Recorder->GetReplayer();
   }
 
-  std::string StartRecorder(std::string name, bool AdditionalData);
+  std::string StartRecorder(std::string name);
 
 private:
 

@@ -35,7 +35,7 @@ class MarkdownFile:
         self._data = ""
         self._list_depth = 0
         self.endl = '  \n'
-
+    
     def data(self):
         return self._data
 
@@ -76,6 +76,11 @@ class MarkdownFile:
         self._data = join([
             self._data, '#Python API reference\n'])
 
+    def button_apis(self):
+        self._data = join([
+            self._data, 
+            ''])
+
     def title(self, strongness, buf):
         self._data = join([
             self._data, '\n', self.list_depth(), '#' * strongness, ' ', buf, '\n'])
@@ -90,7 +95,7 @@ class MarkdownFile:
 
     def inherit_join(self, inh):
         self._data = join([
-            self._data, '<small style="display:block;margin-top:-20px;">**Inherited from ', inh, '**</small></br>\n'])
+            self._data,'<div style="padding-left:30px;margin-top:-20px"><small><b>Inherited from ',inh,'</b></small></div></p><p>'])
 
     def note(self, buf):
         self._data = join([self._data, buf])
@@ -123,10 +128,6 @@ def brackets(buf):
 
 def parentheses(buf):
     return join(['(', buf, ')'])
-
-
-def small_html(buf):
-    return join(['<small>', buf, '</small>'])
 
 
 def small(buf):
@@ -327,14 +328,11 @@ def add_doc_method_param(md, param):
     param_name = param['param_name']
     param_type = ''
     param_doc = ''
-    param_units = ''
     if valid_dic_val(param, 'type'):
         param_type = create_hyperlinks(param['type'])
     if valid_dic_val(param, 'doc'):
         param_doc = create_hyperlinks(md.prettify_doc(param['doc']))
-    if valid_dic_val(param, 'param_units'):
-        param_units = small_html(' – '+param['param_units'])
-    param_type = '' if not param_type else parentheses(italic(param_type+param_units))
+    param_type = '' if not param_type else parentheses(italic(param_type))
     md.list_push(code(param_name))
     if param_type:
         md.text(' ' + param_type)
@@ -374,10 +372,7 @@ def add_doc_method(md, method, class_key):
     # Return doc
     if valid_dic_val(method, 'return'):
         md.list_push(bold('Return:') + ' ')
-        return_units = ''
-        if valid_dic_val(method, 'return_units'):
-            return_units = small_html(' – '+method['return_units'])
-        md.textn(italic(create_hyperlinks(method['return'])+return_units))
+        md.textn(italic(create_hyperlinks(method['return'])))
         md.list_pop()
 
     # Note doc
@@ -428,10 +423,7 @@ def add_doc_getter_setter(md, method,class_key,is_getter,other_list):
     # Return doc
     if valid_dic_val(method, 'return'):
         md.list_push(bold('Return:') + ' ')
-        return_units = ''
-        if valid_dic_val(method, 'return_units'):
-            return_units = small_html(' – '+method['return_units'])
-        md.textn(italic(create_hyperlinks(method['return'])+return_units))
+        md.textn(italic(create_hyperlinks(method['return'])))
         md.list_pop()
 
     # If setter/getter
@@ -501,13 +493,11 @@ def add_doc_inst_var(md, inst_var, class_key):
     var_name = inst_var['var_name']
     var_key = join([class_key, var_name], '.')
     var_type = ''
-    var_units = ''
 
     # Instance variable type
     if valid_dic_val(inst_var, 'type'):
-        if valid_dic_val(inst_var, 'var_units'):
-            var_units = small_html(' – '+inst_var['var_units'])
-        var_type = ' ' + parentheses(italic(create_hyperlinks(inst_var['type']+var_units)))
+        var_type = ' ' + parentheses(italic(create_hyperlinks(inst_var['type'])))
+
     md.list_pushn(
         html_key(var_key) +
         bold(color(COLOR_INSTANCE_VAR, var_name)) +
@@ -605,8 +595,8 @@ class Documentation:
                     class_name = cl['class_name']
                     class_key = join([module_key, class_name], '.')
                     current_title = module_name+'.'+class_name
-                    md.title(2, join([current_title,'<a name="',current_title,'"></a>']))
-                    # Inheritance
+                    md.title(2, join([current_title,'<a name="'+current_title+'"></a>']))
+                    inherits = ''
                     if valid_dic_val(cl, 'parent'):
                         inherits = italic(create_hyperlinks(cl['parent']))
                         md.inherit_join(inherits)

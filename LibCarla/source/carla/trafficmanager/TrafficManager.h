@@ -57,14 +57,6 @@ public:
     return (_port > 1023);
   }
 
-  /// Method to set Open Street Map mode.
-  void SetOSMMode(const bool mode_switch) {
-    TrafficManagerBase* tm_ptr = GetTM(_port);
-    if (tm_ptr != nullptr) {
-      tm_ptr->SetOSMMode(mode_switch);
-    }
-  }
-
   /// This method sets the hybrid physics mode.
   void SetHybridPhysicsMode(const bool mode_switch) {
     TrafficManagerBase* tm_ptr = GetTM(_port);
@@ -230,14 +222,6 @@ public:
     }
   }
 
-  /// Method to set randomization seed.
-  void SetRandomDeviceSeed(const uint64_t seed) {
-    TrafficManagerBase* tm_ptr = GetTM(_port);
-    if(tm_ptr != nullptr){
-      tm_ptr->SetRandomDeviceSeed(seed);
-    }
-  }
-
 private:
 
   void CreateTrafficManagerServer(
@@ -253,6 +237,7 @@ private:
     std::lock_guard<std::mutex> lock(_mutex);
     auto it = _tm_map.find(port);
     if (it != _tm_map.end()) {
+      _mutex.unlock();
       return it->second;
     }
     return nullptr;

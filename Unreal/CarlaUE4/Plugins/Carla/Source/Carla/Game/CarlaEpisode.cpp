@@ -299,18 +299,6 @@ void UCarlaEpisode::InitializeAtBeginPlay()
     ActorDispatcher->RegisterActor(*Actor, Description);
   }
 
-  // get the definition id for static.prop.mesh
-  auto Definitions = GetActorDefinitions();
-  uint32 StaticMeshUId = 0;
-  for (auto& Definition : Definitions)
-  {
-    if (Definition.Id == "static.prop.mesh")
-    {
-      StaticMeshUId = Definition.UId;
-      break;
-    }
-  }
-
   for (TActorIterator<AStaticMeshActor> It(World); It; ++It)
   {
     auto Actor = *It;
@@ -320,15 +308,8 @@ void UCarlaEpisode::InitializeAtBeginPlay()
     if (MeshComponent->Mobility == EComponentMobility::Movable)
     {
       FActorDescription Description;
-      Description.Id = TEXT("static.prop.mesh");
-      Description.UId = StaticMeshUId;
+      Description.Id = TEXT("static.prop");
       Description.Class = Actor->GetClass();
-      Description.Variations.Add("mesh_path",
-          FActorAttribute{"mesh_path", EActorAttributeType::String,
-          MeshComponent->GetStaticMesh()->GetPathName()});
-      Description.Variations.Add("mass",
-          FActorAttribute{"mass", EActorAttributeType::Float,
-          FString::SanitizeFloat(MeshComponent->GetMass())});
       ActorDispatcher->RegisterActor(*Actor, Description);
     }
   }
@@ -347,13 +328,13 @@ void UCarlaEpisode::EndPlay(void)
   }
 }
 
-std::string UCarlaEpisode::StartRecorder(std::string Name, bool AdditionalData)
+std::string UCarlaEpisode::StartRecorder(std::string Name)
 {
   std::string result;
 
   if (Recorder)
   {
-    result = Recorder->Start(Name, MapName, AdditionalData);
+    result = Recorder->Start(Name, MapName);
   }
   else
   {

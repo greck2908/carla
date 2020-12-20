@@ -57,30 +57,22 @@ __Props__ need the following parameters.
 	*   `medium`  
 	*   `big`  
 	*   `huge`  
-*   __tag__ value for the semantic segmentation. If the tag is misspelled, it will be read as `Unlabeled`. 
-	*   `Bridge`
-	*   `Building`
-	*   `Dynamic`
-	*   `Fence`
-	*   `Ground`
-	*   `GuardRail`
-	*   `Other`
-	*   `Pedestrian`
+*   __tag__ value for the semantic segmentation. If the tag is misspelled, it will be read as `None`. 
+	*   `None`
+	*   `Buildings`
+	*   `Fences`
+	*   `Pedestrians`
 	*   `Pole`
+	*   `Props`
 	*   `RailTrack`
 	*   `Road`
-	*   `RoadLine`
-	*   `SideWalk`
-	*   `Sky`
-	*   `Static`
+	*   `RoadLines`
+	*   `Sidewalk`
 	*   `Terrain`
-	*   `TrafficLight`
-	*   `TrafficSign`
-	*   `Unlabeled`
+	*   `TrafficSigns`
 	*   `Vegetation`
 	*   `Vehicles`
-	*   `Wall`
-	*   `Water`
+	*   `Walls`
 
 In the end, the `.json` should look similar to the one below.
 
@@ -119,7 +111,7 @@ __1. Build a Docker image of Unreal Engine.__ Follow [these instructions](https:
 __2. Run the script to cook the props.__ In the folder `~/carla/Util/Docker` there is a script that connects with the Docker image previously created, and makes the ingestion automatically. It only needs the path for the input and output files, and the name of the package to be ingested.  
 
 ```sh
-python3 docker_tools.py --input ~/path_to_package --output ~/path_for_output_assets  --package=Package01
+python docker_tools.py --input ~/path_to_package --output ~/path_for_output_assets  --package=Package01
 ```
 
 __3. Locate the package__. The Docker should have generated the package `Package01.tar.gz` in the output path. This is the standalone package for the assets. 

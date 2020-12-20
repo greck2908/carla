@@ -30,11 +30,6 @@ namespace geom {
     // -- Constructors ---------------------------------------------------------
     // =========================================================================
 
-    explicit BoundingBox(const Location &in_location, const Vector3D &in_extent, const Rotation &in_rotation)
-      : location(in_location),
-        extent(in_extent),
-        rotation(in_rotation) {}
-
     explicit BoundingBox(const Location &in_location, const Vector3D &in_extent)
       : location(in_location),
         extent(in_extent) {}
@@ -43,8 +38,7 @@ namespace geom {
       : extent(in_extent) {}
 
     Location location;  ///< Center of the BoundingBox in local space
-    Vector3D extent;    ///< Half the size of the BoundingBox in local space
-    Rotation rotation;  ///< Rotation of the BoundingBox in local space
+    Vector3D extent;    ///< Half the size of the BoundingBox  in local space
 
     // =========================================================================
     // -- Other methods --------------------------------------------------------
@@ -69,16 +63,15 @@ namespace geom {
      *  Returns the positions of the 8 vertices of this BoundingBox in local space.
      */
     std::array<Location, 8> GetLocalVertices() const {
-
         return {{
-            location + Location(rotation.RotateVector({-extent.x,-extent.y,-extent.z})),
-            location + Location(rotation.RotateVector({-extent.x,-extent.y, extent.z})),
-            location + Location(rotation.RotateVector({-extent.x, extent.y,-extent.z})),
-            location + Location(rotation.RotateVector({-extent.x, extent.y, extent.z})),
-            location + Location(rotation.RotateVector({ extent.x,-extent.y,-extent.z})),
-            location + Location(rotation.RotateVector({ extent.x,-extent.y, extent.z})),
-            location + Location(rotation.RotateVector({ extent.x, extent.y,-extent.z})),
-            location + Location(rotation.RotateVector({ extent.x, extent.y, extent.z}))
+            location + Location(-extent.x,-extent.y,-extent.z),
+            location + Location(-extent.x,-extent.y, extent.z),
+            location + Location(-extent.x, extent.y,-extent.z),
+            location + Location(-extent.x, extent.y, extent.z),
+            location + Location( extent.x,-extent.y,-extent.z),
+            location + Location( extent.x,-extent.y, extent.z),
+            location + Location( extent.x, extent.y,-extent.z),
+            location + Location( extent.x, extent.y, extent.z)
         }};
     }
 
@@ -99,7 +92,7 @@ namespace geom {
     // =========================================================================
 
     bool operator==(const BoundingBox &rhs) const  {
-      return (location == rhs.location) && (extent == rhs.extent) && (rotation == rhs.rotation);
+      return (location == rhs.location) && (extent == rhs.extent);
     }
 
     bool operator!=(const BoundingBox &rhs) const  {
@@ -114,12 +107,11 @@ namespace geom {
 
     BoundingBox(const FBoundingBox &Box)
       : location(Box.Origin),
-        extent(1e-2f * Box.Extent.X, 1e-2f * Box.Extent.Y, 1e-2f * Box.Extent.Z),
-        rotation(Box.Rotation) {}
+        extent(1e-2f * Box.Extent.X, 1e-2f * Box.Extent.Y, 1e-2f * Box.Extent.Z) {}
 
 #endif // LIBCARLA_INCLUDED_FROM_UE4
 
-    MSGPACK_DEFINE_ARRAY(location, extent, rotation);
+    MSGPACK_DEFINE_ARRAY(location, extent);
   };
 
 } // namespace geom

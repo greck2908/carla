@@ -13,8 +13,6 @@
 #include "Containers/Map.h"
 #include "TrafficLightController.generated.h"
 
-class ATrafficLightGroup;
-
 /// Defines a stage of a semaphor with a State and
 /// the time this state lasts
 USTRUCT(BlueprintType)
@@ -49,13 +47,6 @@ public:
   // Updates traffic light components to the next state
   UFUNCTION(Category = "Traffic Controller", BlueprintCallable)
   float NextState();
-
-  // Advances the counter of the controller and returns true if The cicle is finished
-  UFUNCTION(Category = "Traffic Controller", BlueprintCallable)
-  bool AdvanceTimeAndCycleFinished(float DeltaTime);
-
-  UFUNCTION(Category = "Traffic Controller", BlueprintCallable)
-  void StartCycle();
 
   UFUNCTION(Category = "Traffic Controller", BlueprintPure)
   const TArray<UTrafficLightComponent *> &GetTrafficLights();
@@ -105,17 +96,6 @@ public:
   UFUNCTION(Category = "Traffic Controller", BlueprintCallable)
   float GetRedTime() const;
 
-  UFUNCTION(Category = "Traffic Controller", BlueprintCallable)
-  float GetElapsedTime() const;
-
-  UFUNCTION(Category = "Traffic Controller", BlueprintCallable)
-  void SetElapsedTime(float InElapsedTime);
-
-  void SetGroup(ATrafficLightGroup* Group);
-
-  ATrafficLightGroup* GetGroup();
-
-  const ATrafficLightGroup* GetGroup() const;
 
 private:
 
@@ -124,7 +104,7 @@ private:
   float GetStateTime(const ETrafficLightState State) const;
 
   UPROPERTY(Category = "Traffic Controller", EditAnywhere)
-  FString ControllerId = "";
+  FString ControllerId;
 
   UPROPERTY(Category = "Traffic Controller", EditAnywhere)
   int CurrentState = 0;
@@ -140,14 +120,7 @@ private:
   UPROPERTY(Category = "Traffic Controller", EditAnywhere)
   TArray<UTrafficLightComponent *> TrafficLights;
 
-  UPROPERTY(Category = "Traffic Controller", VisibleAnywhere)
-  ATrafficLightGroup* TrafficLightGroup;
-
   // Sequence within junction (unused for now)
   UPROPERTY(Category = "Traffic Controller", EditAnywhere)
   int Sequence = 0;
-
-  UPROPERTY()
-  float ElapsedTime = 0;
-
 };

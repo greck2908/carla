@@ -21,7 +21,6 @@
 #include "carla/trafficmanager/AtomicActorSet.h"
 #include "carla/trafficmanager/InMemoryMap.h"
 #include "carla/trafficmanager/Parameters.h"
-#include "carla/trafficmanager/RandomGenerator.h"
 #include "carla/trafficmanager/SimulationState.h"
 #include "carla/trafficmanager/TrackTraffic.h"
 #include "carla/trafficmanager/TrafficManagerBase.h"
@@ -110,11 +109,6 @@ private:
   std::condition_variable step_end_trigger;
   /// Single worker thread for sequential execution of sub-components.
   std::unique_ptr<std::thread> worker_thread;
-  /// Structure holding random devices per vehicle.
-  RandomGeneratorMap random_devices;
-  /// Randomization seed.
-  uint64_t seed {static_cast<uint64_t>(time(NULL))};
-  std::vector<ActorId> marked_for_removal;
 
   /// Method to check if all traffic lights are frozen in a group.
   bool CheckAllFrozen(TLGroup tl_to_freeze);
@@ -154,7 +148,7 @@ public:
   void RegisterVehicles(const std::vector<ActorPtr> &actor_list);
 
   /// This method unregisters a vehicle from traffic manager.
-  void UnregisterVehicles(const std::vector<ActorPtr> &actor_list);
+    void UnregisterVehicles(const std::vector<ActorPtr> &actor_list);
 
   /// Method to set a vehicle's % decrease in velocity with respect to the speed limit.
   /// If less than 0, it's a % increase.
@@ -202,9 +196,6 @@ public:
   /// Method to reset all traffic light groups to the initial stage.
   void ResetAllTrafficLights();
 
-  /// Method to start all traffic light groups to the initial stage.
-  void StartAllTrafficLights();
-
   /// Get CARLA episode information.
   carla::client::detail::EpisodeProxy &GetEpisodeProxy();
 
@@ -223,12 +214,6 @@ public:
 
   /// Method to set hybrid physics radius.
   void SetHybridPhysicsRadius(const float radius);
-
-  /// Method to set randomization seed.
-  void SetRandomDeviceSeed(const uint64_t _seed);
-
-  /// Method to set Open Street Map mode.
-  void SetOSMMode(const bool mode_switch);
 };
 
 } // namespace traffic_manager

@@ -10,6 +10,7 @@ from setuptools import setup, Extension
 
 import fnmatch
 import os
+import platform
 import sys
 
 def is_rss_variant_enabled():
@@ -32,9 +33,8 @@ def get_libcarla_extensions():
                 yield os.path.join(root, filename)
 
     if os.name == "posix":
-        import distro
-
-        linux_distro = distro.linux_distribution()[0]
+        # @todo Replace deprecated method.
+        linux_distro = platform.dist()[0]  # pylint: disable=W1505
         if linux_distro.lower() in ["ubuntu", "debian", "deepin"]:
             pwd = os.path.dirname(os.path.realpath(__file__))
             pylib = "libboost_python%d%d.a" % (sys.version_info.major,
@@ -50,10 +50,7 @@ def get_libcarla_extensions():
                 os.path.join(pwd, 'dependencies/lib/libboost_filesystem.a'),
                 os.path.join(pwd, 'dependencies/lib/libRecast.a'),
                 os.path.join(pwd, 'dependencies/lib/libDetour.a'),
-                os.path.join(pwd, 'dependencies/lib/libDetourCrowd.a'),
-                os.path.join(pwd, 'dependencies/lib/libosm2odr.a'),
-                os.path.join(pwd, 'dependencies/lib/libxerces-c.a')]
-            extra_link_args += ['-lz']
+                os.path.join(pwd, 'dependencies/lib/libDetourCrowd.a')]
             extra_compile_args = [
                 '-isystem', 'dependencies/include/system', '-fPIC', '-std=c++14',
                 '-Werror', '-Wall', '-Wextra', '-Wpedantic', '-Wno-self-assign-overloaded',
@@ -77,9 +74,10 @@ def get_libcarla_extensions():
                 extra_link_args += [os.path.join(pwd, 'dependencies/lib/libad_map_opendrive_reader.a')]
                 extra_link_args += [os.path.join(pwd, 'dependencies/lib/libboost_program_options.a')]
                 extra_link_args += [os.path.join(pwd, 'dependencies/lib/libspdlog.a')]
-                extra_link_args += [os.path.join(pwd, 'dependencies/lib/libproj.a')]
-                extra_link_args += ['-lrt']
+                extra_link_args += [os.path.join(pwd, 'dependencies/lib/libboost_system.so')]
                 extra_link_args += ['-ltbb']
+                extra_link_args += ['-lrt']
+                extra_link_args += ['-lproj']
 
             extra_link_args += [os.path.join(pwd, 'dependencies/lib', pylib)]
 
@@ -105,14 +103,13 @@ def get_libcarla_extensions():
             sys.version_info.major,
             sys.version_info.minor)
 
-        extra_link_args = ['shlwapi.lib', 'Advapi32.lib']
+        extra_link_args = ['shlwapi.lib' ]
 
         required_libs = [
             pylib, 'libboost_filesystem',
             'rpc.lib', 'carla_client.lib',
             'libpng.lib', 'zlib.lib',
-            'Recast.lib', 'Detour.lib', 'DetourCrowd.lib',
-            'osm2odr.lib', 'xerces-c_3.lib']
+            'Recast.lib', 'Detour.lib', 'DetourCrowd.lib']
 
         # Search for files in 'PythonAPI\carla\dependencies\lib' that contains
         # the names listed in required_libs in it's file name
@@ -157,7 +154,7 @@ def get_license():
 
 setup(
     name='carla',
-    version='0.9.10',
+    version='0.9.9',
     package_dir={'': 'source'},
     packages=['carla'],
     ext_modules=get_libcarla_extensions(),

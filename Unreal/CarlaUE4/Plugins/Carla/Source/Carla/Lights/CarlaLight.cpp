@@ -6,7 +6,7 @@
 
 #include "CarlaLight.h"
 #include "CarlaLightSubsystem.h"
-#include "Carla/Game/CarlaStatics.h"
+
 
 UCarlaLight::UCarlaLight()
 {
@@ -46,7 +46,7 @@ void UCarlaLight::SetLightIntensity(float Intensity)
   UpdateLights();
 }
 
-float UCarlaLight::GetLightIntensity() const
+float UCarlaLight::GetLightIntensity()
 {
   return LightIntensity;
 }
@@ -55,10 +55,9 @@ void UCarlaLight::SetLightColor(FLinearColor Color)
 {
   LightColor = Color;
   UpdateLights();
-  RecordLightChange();
 }
 
-FLinearColor UCarlaLight::GetLightColor() const
+FLinearColor UCarlaLight::GetLightColor()
 {
   return LightColor;
 }
@@ -67,10 +66,9 @@ void UCarlaLight::SetLightOn(bool bOn)
 {
   bLightOn = bOn;
   UpdateLights();
-  RecordLightChange();
 }
 
-bool UCarlaLight::GetLightOn() const
+bool UCarlaLight::GetLightOn()
 {
   return bLightOn;
 }
@@ -80,7 +78,7 @@ void UCarlaLight::SetLightType(ELightType Type)
   LightType = Type;
 }
 
-ELightType UCarlaLight::GetLightType() const
+ELightType UCarlaLight::GetLightType()
 {
   return LightType;
 }
@@ -107,7 +105,6 @@ void UCarlaLight::SetLightState(carla::rpc::LightState LightState)
   LightType = static_cast<ELightType>(LightState._group);
   bLightOn = LightState._active;
   UpdateLights();
-  RecordLightChange();
 }
 
 FVector UCarlaLight::GetLocation() const
@@ -115,25 +112,7 @@ FVector UCarlaLight::GetLocation() const
   return GetOwner()->GetActorLocation();
 }
 
-int UCarlaLight::GetId() const
+uint32 UCarlaLight::GetId() const
 {
-  return Id;
-}
-
-void UCarlaLight::SetId(int InId)
-{
-  Id = InId;
-}
-
-void UCarlaLight::RecordLightChange() const
-{
-  auto* Episode = UCarlaStatics::GetCurrentEpisode(GetWorld());
-  if (Episode)
-  {
-    auto* Recorder = Episode->GetRecorder();
-    if (Recorder && Recorder->IsEnabled())
-    {
-      Recorder->AddEventLightSceneChanged(this);
-    }
-  }
+  return GetUniqueID();
 }

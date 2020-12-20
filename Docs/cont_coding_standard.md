@@ -1,9 +1,5 @@
 # Coding standard
 
-*   [__General__](#general)  
-*   [__Python__](#python)  
-*   [__C++__](#c++)  
-
 ---
 ## General
 

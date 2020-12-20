@@ -7,17 +7,6 @@ which is divided into those in which the recipe is centered, and those that need
 
 There are more recipes to come!
 
-*   [__Actor Spectator Recipe__](#actor-spectator-recipe)  
-*   [__Attach Sensors Recipe__](#attach-sensors-recipe)  
-*   [__Actor Attribute Recipe__](#actor-attribute-recipe)  
-*   [__Converted Image Recipe__](#converted-image-recipe)  
-*   [__Lanes Recipe__](#lanes-recipe)  
-*   [__Debug Bounding Box Recipe__](#debug-bounding-box-recipe)  
-*   [__Debug Vehicle Trail Recipe__](#debug-vehicle-trail-recipe)  
-*   [__Parsing Client Arguments Recipe__](#parsing-client-arguments-recipe)  
-*   [__Traffic Light Recipe__](#traffic-light-recipe)  
-*   [__Walker Batch Recipe__](#walker-batch-recipe)  
-
 ---
 ## Actor Spectator Recipe
 
@@ -65,7 +54,7 @@ Used:<br>
 
 ```py
 # ...
-camera = world.spawn_actor(rgb_camera_bp, transform, attach_to=vehicle, attachment_type=Attachment.Rigid)
+camera = world.spawn_actor(rgb_camera_bp, transform, attach_to=vehicle, attachment_type=Attachment.SpringArm)
 # Default attachment:  Attachment.Rigid
 gnss_sensor = world.spawn_actor(sensor_gnss_bp, transform, attach_to=vehicle)
 collision_sensor = world.spawn_actor(sensor_collision_bp, transform, attach_to=vehicle)
@@ -233,7 +222,7 @@ path it was following and the speed at each waypoint.
 ![debug_trail_recipe](img/recipe_debug_trail.jpg)
 
 ---
-## Parsing Client Arguments Recipe
+## Parse client creation arguments
 
 This recipe shows in every script provided in `PythonAPI/Examples` and it is used to parse the client creation arguments when running the script. 
 
@@ -272,7 +261,7 @@ Used:<br>
 ```
 
 ---
-## Traffic Light Recipe
+## Traffic lights Recipe
 
 This recipe changes from red to green the traffic light that affects the vehicle.
 This is done by detecting if the vehicle actor is at a traffic light.
@@ -297,7 +286,7 @@ if vehicle_actor.is_at_traffic_light():
 ![tl_recipe](img/tl_recipe.gif)
 
 ---
-## Walker Batch Recipe
+## Walker batch recipe
 
 ```py
 # 0. Choose a blueprint fo the walkers

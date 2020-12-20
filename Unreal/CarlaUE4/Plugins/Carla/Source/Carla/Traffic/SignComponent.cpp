@@ -83,13 +83,3 @@ UBoxComponent* USignComponent::GenerateTriggerBox(const FTransform &BoxTransform
   BoxComponent->SetBoxExtent(FVector(BoxSize, BoxSize, BoxSize), true);
   return BoxComponent;
 }
-
-void USignComponent::AddEffectTriggerVolume(UBoxComponent* TriggerVolume)
-{
-  EffectTriggerVolumes.Add(TriggerVolume);
-}
-
-const TArray<UBoxComponent*> USignComponent::GetEffectTriggerVolume() const
-{
-  return EffectTriggerVolumes;
-}

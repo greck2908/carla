@@ -10,10 +10,10 @@
 
 namespace ad {
 namespace rss {
-namespace state {
+namespace world {
 
-/// @brief forward declararion for the RSS proper response
-struct ProperResponse;
+/// @brief forward declararion for the RSS Acceleration restrictions
+struct AccelerationRestriction;
 
 }  // namespace world
 }  // namespace rss
@@ -46,7 +46,7 @@ public:
   ///        Lateral braking is achieved by counter-steering, so is only a very
   ///        rough solution
   carla::rpc::VehicleControl RestrictVehicleControl(const carla::rpc::VehicleControl &vehicle_control,
-                                                    const ::ad::rss::state::ProperResponse &proper_response,
+                                                    const ::ad::rss::world::AccelerationRestriction &restriction,
                                                     const carla::rss::EgoDynamicsOnRoute &ego_dynamics_on_route,
                                                     const carla::rpc::VehiclePhysicsControl &vehicle_physics);
 

@@ -135,7 +135,7 @@ class LocalPlanner(object):
 
         self._target_speed = speed
 
-    def set_global_plan(self, current_plan, clean=False):
+    def set_global_plan(self, current_plan):
         """
         Sets new global plan.
 
@@ -143,16 +143,6 @@ class LocalPlanner(object):
         """
         for elem in current_plan:
             self.waypoints_queue.append(elem)
-
-        if clean:
-            self._waypoint_buffer.clear()
-            for _ in range(self._buffer_size):
-                if self.waypoints_queue:
-                    self._waypoint_buffer.append(
-                        self.waypoints_queue.popleft())
-                else:
-                    break
-
         self._global_plan = True
 
     def get_incoming_waypoint_and_direction(self, steps=3):
