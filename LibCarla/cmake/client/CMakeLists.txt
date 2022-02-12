@@ -8,6 +8,7 @@ if (BUILD_RSS_VARIANT)
   set(carla_target_postfix "_rss")
   set(ADRSS_INCLUDE_DIRS)
   set(ADRSS_LIBS)
+
   find_package(spdlog CONFIG REQUIRED
     HINTS ${ADRSS_INSTALL_DIR}/spdlog/)
   get_target_property(spdlog_include_dirs spdlog::spdlog INTERFACE_INCLUDE_DIRECTORIES)
@@ -20,24 +21,20 @@ if (BUILD_RSS_VARIANT)
   install(FILES ${spdlog_file} DESTINATION lib)
   list(APPEND ADRSS_LIBS ${spdlog_file})
 
-  install(FILES ${ADRSS_INSTALL_DIR}/PROJ4/lib/libproj.a DESTINATION lib)
-
   foreach(ad_lib ad_physics ad_rss ad_map_access ad_map_opendrive_reader ad_rss_map_integration)
     set(${ad_lib}_file ${ADRSS_INSTALL_DIR}/${ad_lib}/lib/lib${ad_lib}.a)
     install(FILES ${${ad_lib}_file} DESTINATION lib)
     list(APPEND ADRSS_LIBS ${${ad_lib}_file})
 
-    get_filename_component(ad_lib_dir ${${ad_lib}_file} DIRECTORY)
-    get_filename_component(ad_lib_name_we ${${ad_lib}_file} NAME_WE)
-    foreach(ad_lib_python ${ad_lib_dir}/${ad_lib_name_we}_python2.a ${ad_lib_dir}/${ad_lib_name_we}_python3.a)
-      if (EXISTS ${ad_lib_python})
-        install(FILES ${ad_lib_python} DESTINATION lib)
+    # Install corresponding python libs if available
+    file(GLOB ${ad_lib}_python_libs "${ADRSS_INSTALL_DIR}/${ad_lib}/lib/lib${ad_lib}_python*.a")
+    foreach(ad_python_lib ${${ad_lib}_python_libs})
+      if (EXISTS ${ad_python_lib})
+        install(FILES ${ad_python_lib} DESTINATION lib)
       endif()
-      #message("Lib: ${ad_lib} : loc: ${${ad_lib}_file}, python: ${ad_lib_python}")
     endforeach()
 
     set(${ad_lib}_include_dir ${ADRSS_INSTALL_DIR}/${ad_lib}/include)
-    #message("  Inc: ${${ad_lib}_include_dir}")
     file(GLOB ${ad_lib}_includes "${${ad_lib}_include_dir}/*")
     install(DIRECTORY ${${ad_lib}_includes} DESTINATION include/system)
     list(APPEND ADRSS_INCLUDE_DIRS ${${ad_lib}_include_dir})

@@ -9,6 +9,7 @@
 #include "Carla/Sensor/PixelReader.h"
 #include "Carla/Sensor/Sensor.h"
 
+#include "Runtime/RenderCore/Public/RenderCommandFence.h"
 #include "SceneCaptureSensor.generated.h"
 
 class UDrawFrustumComponent;
@@ -60,6 +61,18 @@ public:
   bool ArePostProcessingEffectsEnabled() const
   {
     return bEnablePostProcessingEffects;
+  }
+
+  UFUNCTION(BlueprintCallable)
+  void Enable16BitFormat(bool Enable = false)
+  {
+    bEnable16BitFormat = Enable;
+  }
+
+  UFUNCTION(BlueprintCallable)
+  bool Is16BitFormatEnabled() const
+  {
+    return bEnable16BitFormat;
   }
 
   UFUNCTION(BlueprintCallable)
@@ -270,19 +283,31 @@ public:
     FPixelReader::SavePixelsToDisk(*CaptureRenderTarget, FilePath);
   }
 
+  UFUNCTION(BlueprintCallable)
+  USceneCaptureComponent2D *GetCaptureComponent2D()
+  {
+    return CaptureComponent2D;
+  }
+
+  /// Immediate enqueues render commands of the scene at the current time.
+  void EnqueueRenderSceneImmediate();
+
+  /// Blocks until the render thread has finished all it's tasks.
+  void WaitForRenderThreadToFinsih() {
+    TRACE_CPUPROFILER_EVENT_SCOPE(ASceneCaptureSensor::WaitForRenderThreadToFinsih);
+    // FlushRenderingCommands();
+  }
+
 protected:
 
   virtual void BeginPlay() override;
 
-  virtual void Tick(float DeltaTime) override;
+  virtual void PrePhysTick(float DeltaSeconds) override;
+  virtual void PostPhysTick(UWorld *World, ELevelTick TickType, float DeltaTime) override;
 
   virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
   virtual void SetUpSceneCaptureComponent(USceneCaptureComponent2D &SceneCapture) {}
-
-  virtual void SendPixels(UWorld *World, ELevelTick TickType, float DeltaSeconds) {}
-
-  FDelegateHandle SendPixelsDelegate;
 
   /// Render target necessary for scene capture.
   UPROPERTY(EditAnywhere)
@@ -306,5 +331,11 @@ protected:
   /// Whether to render the post-processing effects present in the scene.
   UPROPERTY(EditAnywhere)
   bool bEnablePostProcessingEffects = true;
+
+  /// Whether to change render target format to PF_A16B16G16R16, offering 16bit / channel
+  UPROPERTY(EditAnywhere)
+  bool bEnable16BitFormat = false;
+
+  FRenderCommandFence RenderFence;
 
 };

@@ -10,21 +10,29 @@
 #include "carla/NonCopyable.h"
 #include "carla/Time.h"
 #include "carla/geom/Transform.h"
+#include "carla/geom/Location.h"
 #include "carla/rpc/Actor.h"
 #include "carla/rpc/ActorDefinition.h"
 #include "carla/rpc/AttachmentType.h"
 #include "carla/rpc/Command.h"
 #include "carla/rpc/CommandResponse.h"
+#include "carla/rpc/EnvironmentObject.h"
 #include "carla/rpc/EpisodeInfo.h"
 #include "carla/rpc/EpisodeSettings.h"
+#include "carla/rpc/LabelledPoint.h"
 #include "carla/rpc/LightState.h"
 #include "carla/rpc/MapInfo.h"
-#include "carla/rpc/TrafficLightState.h"
-#include "carla/rpc/VehiclePhysicsControl.h"
-#include "carla/rpc/VehicleLightState.h"
-#include "carla/rpc/WeatherParameters.h"
+#include "carla/rpc/MapLayer.h"
 #include "carla/rpc/OpendriveGenerationParameters.h"
+#include "carla/rpc/TrafficLightState.h"
+#include "carla/rpc/VehicleDoor.h"
 #include "carla/rpc/VehicleLightStateList.h"
+#include "carla/rpc/VehicleLightState.h"
+#include "carla/rpc/VehiclePhysicsControl.h"
+#include "carla/rpc/VehicleWheels.h"
+#include "carla/rpc/WeatherParameters.h"
+#include "carla/rpc/Texture.h"
+#include "carla/rpc/MaterialParameter.h"
 
 #include <functional>
 #include <memory>
@@ -39,7 +47,8 @@ namespace rpc {
   class DebugShape;
   class VehicleControl;
   class WalkerControl;
-  class WalkerBoneControl;
+  class WalkerBoneControlIn;
+  class WalkerBoneControlOut;
 }
 namespace sensor {
   class SensorData;
@@ -87,16 +96,42 @@ namespace detail {
 
     std::string GetServerVersion();
 
-    void LoadEpisode(std::string map_name);
+    void LoadEpisode(std::string map_name, bool reset_settings = true, rpc::MapLayer map_layer = rpc::MapLayer::All);
+
+    void LoadLevelLayer(rpc::MapLayer map_layer) const;
+
+    void UnloadLevelLayer(rpc::MapLayer map_layer) const;
 
     void CopyOpenDriveToServer(
         std::string opendrive, const rpc::OpendriveGenerationParameters & params);
+
+    void ApplyColorTextureToObjects(
+        const std::vector<std::string> &objects_name,
+        const rpc::MaterialParameter& parameter,
+        const rpc::TextureColor& Texture);
+
+    void ApplyColorTextureToObjects(
+        const std::vector<std::string> &objects_name,
+        const rpc::MaterialParameter& parameter,
+        const rpc::TextureFloatColor& Texture);
+
+    std::vector<std::string> GetNamesOfAllObjects() const;
 
     rpc::EpisodeInfo GetEpisodeInfo();
 
     rpc::MapInfo GetMapInfo();
 
     std::vector<uint8_t> GetNavigationMesh() const;
+
+    bool SetFilesBaseFolder(const std::string &path);
+
+    std::vector<std::string> GetRequiredFiles(const std::string &folder = "", const bool download = true) const;
+
+    std::string GetMapData() const;
+
+    void RequestFile(const std::string &name) const;
+
+    std::vector<uint8_t> GetCacheFile(const std::string &name, const bool request_otherwise = true) const;
 
     std::vector<std::string> GetAvailableMaps();
 
@@ -125,6 +160,14 @@ namespace detail {
     void SetLightStateToVehicle(
         rpc::ActorId vehicle,
         const rpc::VehicleLightState &light_state);
+
+    void OpenVehicleDoor(
+        rpc::ActorId vehicle,
+        const rpc::VehicleDoor door_idx);
+
+    void CloseVehicleDoor(
+        rpc::ActorId vehicle,
+        const rpc::VehicleDoor door_idx);
 
     rpc::Actor SpawnActor(
         const rpc::ActorDescription &description,
@@ -199,17 +242,59 @@ namespace detail {
         rpc::ActorId vehicle,
         bool enabled);
 
+    void ShowVehicleDebugTelemetry(
+        rpc::ActorId vehicle,
+        bool enabled);
+
     void ApplyControlToVehicle(
         rpc::ActorId vehicle,
         const rpc::VehicleControl &control);
+
+    void EnableCarSim(
+        rpc::ActorId vehicle,
+        std::string simfile_path);
+
+    void UseCarSimRoad(
+        rpc::ActorId vehicle,
+        bool enabled);
+
+    void SetWheelSteerDirection(
+        rpc::ActorId vehicle,
+        rpc::VehicleWheelLocation vehicle_wheel,
+        float angle_in_deg
+    );
+
+    float GetWheelSteerAngle(
+        rpc::ActorId vehicle,
+        rpc::VehicleWheelLocation wheel_location
+    );
+
+    void EnableChronoPhysics(
+        rpc::ActorId vehicle,
+        uint64_t MaxSubsteps,
+        float MaxSubstepDeltaTime,
+        std::string VehicleJSON,
+        std::string PowertrainJSON,
+        std::string TireJSON,
+        std::string BaseJSONPath);
 
     void ApplyControlToWalker(
         rpc::ActorId walker,
         const rpc::WalkerControl &control);
 
-    void ApplyBoneControlToWalker(
+    rpc::WalkerBoneControlOut GetBonesTransform(
+        rpc::ActorId walker);
+
+    void SetBonesTransform(
         rpc::ActorId walker,
-        const rpc::WalkerBoneControl &control);
+        const rpc::WalkerBoneControlIn &bones);
+
+    void BlendPose(
+        rpc::ActorId walker, 
+        float blend);
+
+    void GetPoseFromAnimation(
+        rpc::ActorId walker);
 
     void SetTrafficLightState(
         rpc::ActorId traffic_light,
@@ -238,6 +323,9 @@ namespace detail {
 
     void FreezeAllTrafficLights(bool frozen);
 
+    std::vector<geom::BoundingBox> GetLightBoxes(
+        rpc::ActorId traffic_light) const;
+
     /// Returns a list of pairs where the firts element is the vehicle ID
     /// and the second one is the light state
     rpc::VehicleLightStateList GetVehiclesLightStates();
@@ -255,7 +343,8 @@ namespace detail {
 
     std::string ShowRecorderActorsBlocked(std::string name, double min_time, double min_distance);
 
-    std::string ReplayFile(std::string name, double start, double duration, uint32_t follow_id);
+    std::string ReplayFile(std::string name, double start, double duration,
+        uint32_t follow_id, bool replay_sensors);
 
     void SetReplayerTimeFactor(double time_factor);
 
@@ -289,6 +378,18 @@ namespace detail {
 
     /// Returns all the BBs of all the elements of the level
     std::vector<geom::BoundingBox> GetLevelBBs(uint8_t queried_tag) const;
+
+    std::vector<rpc::EnvironmentObject> GetEnvironmentObjects(uint8_t queried_tag) const;
+
+    void EnableEnvironmentObjects(
+      std::vector<uint64_t> env_objects_ids,
+      bool enable) const;
+
+    std::pair<bool,rpc::LabelledPoint> ProjectPoint(
+        geom::Location location, geom::Vector3D direction, float search_distance) const;
+
+    std::vector<rpc::LabelledPoint> CastRay(
+        geom::Location start_location, geom::Location end_location) const;
 
   private:
 

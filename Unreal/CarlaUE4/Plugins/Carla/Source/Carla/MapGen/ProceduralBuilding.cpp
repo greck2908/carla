@@ -14,8 +14,9 @@ AProceduralBuilding::AProceduralBuilding()
   CornerVisibility.Init(true, 4);
   UseWallMesh.Init(false, 4);
 
-  UStaticMeshComponent* StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RootComponent"));
-  RootComponent = StaticMeshComponent;
+  RootSMComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RootComponent"));
+  RootComponent = RootSMComp;
+  RootComponent->SetMobility(EComponentMobility::Static);
 }
 
 UHierarchicalInstancedStaticMeshComponent* AProceduralBuilding::GetHISMComp(
@@ -43,6 +44,14 @@ UHierarchicalInstancedStaticMeshComponent* AProceduralBuilding::GetHISMComp(
   HISMComps.Emplace(SMName, HISMComp);
 
   return HISMComp;
+}
+
+void AProceduralBuilding::FixMobility() {
+
+  for (UChildActorComponent *ChildComp : ChildActorComps) {
+
+    ChildComp->SetMobility(EComponentMobility::Type::Static);
+  }
 }
 
 void AProceduralBuilding::ConvertOldBP_ToNativeCodeObject(AActor* BP_Building)
@@ -80,6 +89,7 @@ void AProceduralBuilding::ConvertOldBP_ToNativeCodeObject(AActor* BP_Building)
     // Create a new ChildActorComponent
     UChildActorComponent* ChildActorComp = NewObject<UChildActorComponent>(this,
       FName(*FString::Printf(TEXT("ChildActorComp_%d"), ChildActorComps.Num() )));
+    ChildActorComp->SetMobility(EComponentMobility::Type::Static);
     ChildActorComp->SetupAttachment(RootComponent);
 
     // Set the class that it will use
@@ -106,6 +116,20 @@ void AProceduralBuilding::ConvertOldBP_ToNativeCodeObject(AActor* BP_Building)
 
     ChildActorComps.Emplace(ChildActorComp);
 
+  }
+}
+
+void AProceduralBuilding::HideAllChildren()
+{
+  for(UChildActorComponent* ChildActorComp : ChildActorComps)
+  {
+    AActor* ChildActor = ChildActorComp->GetChildActor();
+    TArray<UStaticMeshComponent*> SMComps;
+    ChildActor->GetComponents<UStaticMeshComponent>(SMComps);
+    if(SMComps.Num() > 0)
+    {
+      SMComps[0]->SetVisibility(false, false);
+    }
   }
 }
 
@@ -506,6 +530,7 @@ float AProceduralBuilding::AddChunck(
     // Create a new ChildActorComponent
     UChildActorComponent* ChildActorComp = NewObject<UChildActorComponent>(this,
       FName(*FString::Printf(TEXT("ChildActorComp_%d"), ChildActorComps.Num() )));
+    ChildActorComp->SetMobility(EComponentMobility::Type::Static);
     ChildActorComp->SetupAttachment(RootComponent);
 
     // Set the class that it will use

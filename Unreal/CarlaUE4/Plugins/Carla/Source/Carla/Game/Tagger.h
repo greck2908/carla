@@ -46,6 +46,8 @@ public:
   /// objects having this value active.
   static void TagActorsInLevel(UWorld &World, bool bTagForSemanticSegmentation);
 
+  static void TagActorsInLevel(ULevel &Level, bool bTagForSemanticSegmentation);
+
   /// Retrieve the tag of an already tagged component.
   static crp::CityObjectLabel GetTagOfTaggedComponent(const UPrimitiveComponent &Component)
   {
@@ -81,6 +83,10 @@ public:
 
   static void SetStencilValue(UPrimitiveComponent &Component,
     const crp::CityObjectLabel &Label, const bool bSetRenderCustomDepth);
+
+  static FLinearColor GetActorLabelColor(const AActor &Actor, const crp::CityObjectLabel &Label);
+
+  static bool IsThing(const crp::CityObjectLabel &Label);
 
   ATagger();
 

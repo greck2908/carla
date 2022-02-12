@@ -199,7 +199,7 @@ python3 spawn_npc.py -n 50 -w 50 --safe
   --filterv PATTERN     vehicles filter (default: "vehicle.*")
   --filterw PATTERN     pedestrians filter (default: "walker.pedestrian.*")
   -tm_p P, --tm-port P  port to communicate with TM (default: 8000)
-  --sync                Synchronous mode execution
+  --async               Asynchronous mode execution
 ```
 </details>
 <br>
@@ -563,7 +563,7 @@ The attributes of this sensor mostly set the way the lasers are located.
 * __`range`__ is the maximum distance for the lasers to raycast. 
 * __`points_per_second`__ sets the the amount of points to be captured, that will be divided between the channels stated. 
 
-The script places the sensor on the hood of the car, and rotated a bit upwards. That way, the output will map the front view of the car. The `horizontal_fov` is incremented, and the `vertical_fov` diminished. The area of interest is specially the height were vehicles and walkers usually move on. The `range` is also changed from 100m to 10m, in order to retrieve data only right ahead of the vehicle. 
+The script places the sensor on the hood of the car, and rotated a bit upwards. That way, the output will map the front view of the car. The `horizontal_fov` is incremented, and the `vertical_fov` diminished. The area of interest is specially the height where vehicles and walkers usually move on. The `range` is also changed from 100m to 10m, in order to retrieve data only right ahead of the vehicle. 
 
 The callback is a bit more complex this time, showing more of its capabilities. It will draw the points captured by the radar on the fly. The points will be colored depending on their velocity regarding the ego vehicle.  
 
@@ -840,7 +840,6 @@ Hereunder are the two scripts gathering the fragments of code for this tutorial.
 <summary><b>tutorial_ego.py</b> </summary>
 
 ```py
-
 import glob
 import os
 import sys
@@ -1076,7 +1075,6 @@ if __name__ == '__main__':
 <summary><b>tutorial_replay.py</b></summary>
 
 ```py
-
 import glob
 import os
 import sys
@@ -1338,7 +1336,7 @@ Visit the forum to post any doubts or suggestions that have come to mind during 
 <div text-align: center>
 <div class="build-buttons">
 <p>
-<a href="https://forum.carla.org/" target="_blank" class="btn btn-neutral" title="CARLA forum">
+<a href="https://github.com/carla-simulator/carla/discussions/" target="_blank" class="btn btn-neutral" title="CARLA forum">
 CARLA forum</a>
 </p>
 </div>

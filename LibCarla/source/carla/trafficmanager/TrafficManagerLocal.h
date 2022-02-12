@@ -8,10 +8,10 @@
 
 #include <atomic>
 #include <chrono>
+#include <mutex>
 #include <thread>
 #include <vector>
 
-#include "carla/client/DebugHelper.h"
 #include "carla/client/detail/EpisodeProxy.h"
 #include "carla/client/TrafficLight.h"
 #include "carla/client/World.h"
@@ -55,9 +55,9 @@ private:
   std::vector<float> longitudinal_highway_PID_parameters;
   std::vector<float> lateral_PID_parameters;
   std::vector<float> lateral_highway_PID_parameters;
-  /// Carla's client connection object.
+  /// CARLA client connection object.
   carla::client::detail::EpisodeProxy episode_proxy;
-  /// Carla client and object.
+  /// CARLA client and object.
   cc::World world;
   /// Set of all actors registered with traffic manager.
   AtomicActorSet registered_vehicles;
@@ -70,8 +70,6 @@ private:
   LocalMapPtr local_map;
   /// Structures to hold waypoint buffers for all vehicles.
   BufferMap buffer_map;
-  /// Carla's debug helper object.
-  cc::DebugHelper debug_helper;
   /// Object for tracking paths of the traffic vehicles.
   TrackTraffic track_traffic;
   /// Type containing the current state of all actors involved in the simulation.
@@ -95,6 +93,7 @@ private:
   CollisionStage collision_stage;
   TrafficLightStage traffic_light_stage;
   MotionPlanStage motion_plan_stage;
+  VehicleLightStage vehicle_light_stage;
   ALSM alsm;
   /// Traffic manager server instance.
   TrafficManagerServer server;
@@ -114,7 +113,10 @@ private:
   RandomGeneratorMap random_devices;
   /// Randomization seed.
   uint64_t seed {static_cast<uint64_t>(time(NULL))};
+  bool is_custom_seed {false};
   std::vector<ActorId> marked_for_removal;
+  /// Mutex to prevent vehicle registration during frame array re-allocation.
+  std::mutex registration_mutex;
 
   /// Method to check if all traffic lights are frozen in a group.
   bool CheckAllFrozen(TLGroup tl_to_freeze);
@@ -164,6 +166,9 @@ public:
   /// If less than 0, it's a % increase.
   void SetGlobalPercentageSpeedDifference(float const percentage);
 
+  /// Method to set the automatic management of the vehicle lights
+  void SetUpdateVehicleLights(const ActorPtr &actor, const bool do_update);
+
   /// Method to set collision detection rules between vehicles.
   void SetCollisionDetection(const ActorPtr &reference_actor, const ActorPtr &other_actor, const bool detect_collision);
 
@@ -199,12 +204,6 @@ public:
   /// Method to provide synchronous tick.
   bool SynchronousTick();
 
-  /// Method to reset all traffic light groups to the initial stage.
-  void ResetAllTrafficLights();
-
-  /// Method to start all traffic light groups to the initial stage.
-  void StartAllTrafficLights();
-
   /// Get CARLA episode information.
   carla::client::detail::EpisodeProxy &GetEpisodeProxy();
 
@@ -215,8 +214,14 @@ public:
   /// the Global leading vehicle.
   void SetGlobalDistanceToLeadingVehicle(const float distance);
 
-  /// Method to set probabilistic preference to keep on the right lane.
+  /// Method to set % to keep on the right lane.
   void SetKeepRightPercentage(const ActorPtr &actor, const float percentage);
+
+  /// Method to set % to randomly do a left lane change.
+  void SetRandomLeftLaneChangePercentage(const ActorPtr &actor, const float percentage);
+
+  /// Method to set % to randomly do a right lane change.
+  void SetRandomRightLaneChangePercentage(const ActorPtr &actor, const float percentage);
 
   /// Method to set hybrid physics mode.
   void SetHybridPhysicsMode(const bool mode_switch);
@@ -229,6 +234,41 @@ public:
 
   /// Method to set Open Street Map mode.
   void SetOSMMode(const bool mode_switch);
+
+  /// Method to set our own imported path.
+  void SetCustomPath(const ActorPtr &actor, const Path path, const bool empty_buffer);
+
+  /// Method to remove a list of points.
+  void RemoveUploadPath(const ActorId &actor_id, const bool remove_path);
+
+  /// Method to update an already set list of points.
+  void UpdateUploadPath(const ActorId &actor_id, const Path path);
+
+  /// Method to set our own imported route.
+  void SetImportedRoute(const ActorPtr &actor, const Route route, const bool empty_buffer);
+
+  /// Method to remove a route.
+  void RemoveImportedRoute(const ActorId &actor_id, const bool remove_path);
+
+  /// Method to update an already set route.
+  void UpdateImportedRoute(const ActorId &actor_id, const Route route);
+
+  /// Method to set automatic respawn of dormant vehicles.
+  void SetRespawnDormantVehicles(const bool mode_switch);
+
+  /// Method to set boundaries to respawn of dormant vehicles.
+  void SetBoundariesRespawnDormantVehicles(const float lower_bound, const float upper_bound);
+
+  /// Method to set limits for boundaries when respawning dormant vehicles.
+  void SetMaxBoundaries(const float lower, const float upper);
+
+  /// Method to get the vehicle's next action.
+  Action GetNextAction(const ActorId &actor_id);
+
+  /// Method to get the vehicle's action buffer.
+  ActionBuffer GetActionBuffer(const ActorId &actor_id);
+
+  void ShutDown() {};
 };
 
 } // namespace traffic_manager
